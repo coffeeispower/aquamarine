@@ -178,6 +178,10 @@ bool Aquamarine::CWaylandBackend::dispatchEvents() {
         idleCallbacks.clear();
     }
 
+    for(auto &o : this->outputs) {
+      o->scheduleFrame(IOutput::AQ_SCHEDULE_NEEDS_FRAME);
+    }
+
     return true;
 }
 
@@ -635,7 +639,7 @@ SP<CWaylandBuffer> Aquamarine::CWaylandOutput::wlBufferFromBuffer(SP<IBuffer> bu
 void Aquamarine::CWaylandOutput::sendFrameAndSetCallback() {
     events.frame.emit();
     frameScheduled = false;
-    if (waylandState.frameCallback || !readyForFrameCallback)
+    if (waylandState.frameCallback || readyForFrameCallback)
         return;
 
     waylandState.frameCallback = makeShared<CCWlCallback>(waylandState.surface->sendFrame());
